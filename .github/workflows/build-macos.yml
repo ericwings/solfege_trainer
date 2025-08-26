@@ -1,26 +1,22 @@
-name: Build macOS App
+name: Build macOS App (no icon)
 
 on:
-  workflow_dispatch:   # 在 Actions 页面手动跑
+  workflow_dispatch:    # 手动运行
   push:
-    tags: ['v*']       # 打 tag 也会触发
+    tags: ['v*']        # 打 tag（如 v1.0）也会自动构建
 
 jobs:
-  # Apple Silicon (arm64)
   mac_arm64:
-    runs-on: macos-14     # GitHub 的 macOS 14 机器是 arm64
+    runs-on: macos-14   # Apple Silicon (arm64)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install --upgrade pip pyinstaller
-      - run: >
-          pyinstaller --windowed --name "SolfegeTrainer"
-          --icon icon.icns
-          solfege_trainer.py
-        # 没有图标就去掉 --icon 行
-      - name: Zip .app (preserve resources)
+      - name: Build .app
+        run: pyinstaller --noconfirm --windowed --name "SolfegeTrainer" solfege_trainer.py
+      - name: Zip .app
         run: |
           ditto -c -k --sequesterRsrc --keepParent "dist/SolfegeTrainer.app" "SolfegeTrainer-mac-arm64.zip"
       - uses: actions/upload-artifact@v4
@@ -28,20 +24,18 @@ jobs:
           name: SolfegeTrainer-mac-arm64
           path: SolfegeTrainer-mac-arm64.zip
 
-  # Intel (x86_64) 可选；如果你要给老款 Intel Mac 用，保留这个 job
+  # 如需给 Intel Mac 用，保留此 job；不需要可删除
   mac_intel:
-    runs-on: macos-13     # GitHub 的 macOS 13 机器是 x86_64
+    runs-on: macos-13   # Intel (x86_64)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install --upgrade pip pyinstaller
-      - run: >
-          pyinstaller --windowed --name "SolfegeTrainer"
-          --icon icon.icns
-          solfege_trainer_simple.py
-      - name: Zip .app (preserve resources)
+      - name: Build .app
+        run: pyinstaller --noconfirm --windowed --name "SolfegeTrainer" solfege_trainer.py
+      - name: Zip .app
         run: |
           ditto -c -k --sequesterRsrc --keepParent "dist/SolfegeTrainer.app" "SolfegeTrainer-mac-intel.zip"
       - uses: actions/upload-artifact@v4
