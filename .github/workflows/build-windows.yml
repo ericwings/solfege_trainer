@@ -15,7 +15,7 @@ jobs:
           python-version: '3.12'
       - run: pip install --upgrade pip pyinstaller
       # 根目录有 solfege_trainer_simple.py 时：
-      - run: pyinstaller --windowed --onefile --name SolfegeTrainer solfege_trainer_simple.py
+      - run: pyinstaller --windowed --onefile --name SolfegeTrainer solfege_trainer.py
         # 若脚本在子目录，请改成路径，比如: app/solfege_trainer_simple.py
         # 有图标就加： --icon icon.ico
       - uses: actions/upload-artifact@v4
