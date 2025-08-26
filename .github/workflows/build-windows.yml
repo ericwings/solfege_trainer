@@ -1,0 +1,24 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:   # 在 Actions 页面手动点运行
+  push:
+    tags: ['v*']       # 打 tag（如 v1.0）也会触发
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --upgrade pip pyinstaller
+      # 根目录有 solfege_trainer_simple.py 时：
+      - run: pyinstaller --windowed --onefile --name SolfegeTrainer solfege_trainer_simple.py
+        # 若脚本在子目录，请改成路径，比如: app/solfege_trainer_simple.py
+        # 有图标就加： --icon icon.ico
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SolfegeTrainer-win
+          path: dist/SolfegeTrainer.exe
